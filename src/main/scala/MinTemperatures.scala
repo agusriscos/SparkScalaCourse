@@ -33,7 +33,7 @@ object MinTemperatures {
     val stationTemps = minTemps.map(x => (x._1, x._3))
     
     // Reduce by stationID retaining the minimum temperature found
-    val minTempsByStation = stationTemps.reduceByKey( (x,y) => x min y)
+    val minTempsByStation = stationTemps.reduceByKey(_ min _)
     
     // Collect, format, and print the results
     val results = minTempsByStation.collect()
