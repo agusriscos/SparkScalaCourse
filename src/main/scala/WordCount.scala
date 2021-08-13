@@ -22,13 +22,9 @@ object WordCount {
     
     // Count up the occurrences of each word
     val wordCounts = words.countByValue() // This is a Map
-    val wordCountsSorted = wordCounts.toSeq.sortBy(-_._2) // '-' inside sortBy to sort LIST in descending order
 
     // Print the results.
-    // wordCounts.foreach(println)
-
-    // Print only the first 10 most freq rows
-    wordCountsSorted.take(10).foreach(println)
+    wordCounts.take(10).foreach(println)
   }
   
 }
