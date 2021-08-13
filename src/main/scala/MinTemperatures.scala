@@ -27,7 +27,7 @@ object MinTemperatures {
     val parsedLines = lines.map(parseLine)
     
     // Filter out all but TMIN entries
-    val minTemps = parsedLines.filter(x => x._2 == "TMIN")
+    val minTemps = parsedLines.filter(_._2 == "TMIN")
     
     // Convert to (stationID, temperature)
     val stationTemps = minTemps.map(x => (x._1, x._3))
