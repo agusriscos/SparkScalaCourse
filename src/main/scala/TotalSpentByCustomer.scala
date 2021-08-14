@@ -18,7 +18,11 @@ object TotalSpentByCustomer {
     val lines = sc.textFile("./data/customer-orders.csv")
     val fields = lines.map(parseLines)
     val countByCustomer = fields.reduceByKey(_ + _)
+
+    // Bonus Track: Sort by value
     val countByCustomerSorted = countByCustomer.sortBy(_._2, ascending = false)
+
+    // Get and print the results
     val results = countByCustomerSorted.collect()
     results.foreach(println)
 
