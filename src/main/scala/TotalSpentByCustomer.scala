@@ -18,15 +18,10 @@ object TotalSpentByCustomer {
     val lines = sc.textFile("./data/customer-orders.csv")
     val fields = lines.map(parseLines)
     val countByCustomer = fields.reduceByKey(_ + _)
-    val countByCustomerSorted = countByCustomer.map(x => (x._2, x._1)).sortByKey(ascending = false)
+    val countByCustomerSorted = countByCustomer.sortBy(x => x._2, ascending = false)
     val results = countByCustomerSorted.collect()
+    results.foreach(println)
 
-    // Print first ten clients that spent more
-    for( result <- results.take(10)) {
-      val client = result._2
-      val count = result._1
-      println(s"$client, $count")
-    }
   }
 
 }
