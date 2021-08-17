@@ -11,11 +11,11 @@ object DataFrames {
     val fields = line.split(',')  
     
     val person:Person = Person(fields(0).toInt, fields(1), fields(2).toInt, fields(3).toInt)
-    return person
+    person
   }
   
   /** Our main function where the action happens */
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     
     // Set the log level to only print errors
     Logger.getLogger("org").setLevel(Level.ERROR)
@@ -23,7 +23,7 @@ object DataFrames {
     // Use new SparkSession interface in Spark 2.0
     val spark = SparkSession
       .builder
-      .appName("SparkSQL")
+      .appName("DataFrames")
       .master("local[*]")
       .getOrCreate()
     
@@ -31,7 +31,7 @@ object DataFrames {
     // class to infer the schema.
     import spark.implicits._
     val lines = spark.sparkContext.textFile("./data/fakefriends.csv")
-    val people = lines.map(mapper).toDS()
+    val people = lines.map(mapper).toDS
     val peopleCached = people.select("name", "age").cache()
     
     // There are lots of other ways to make a DataFrame.

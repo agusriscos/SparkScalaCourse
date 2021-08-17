@@ -40,12 +40,13 @@ object FriendsByAge {
     // So now we have tuples of (age, (totalFriends, totalInstances))
     // To compute the average we divide totalFriends / totalInstances for each age.
     val averagesByAge = totalsByAge.mapValues(x => x._1 / x._2)
+    val sortedAveragesByAge = averagesByAge.sortBy(_._2, ascending = false)
     
     // Collect the results from the RDD (This kicks off computing the DAG and actually executes the job)
-    val results = averagesByAge.collect()
+    val results = sortedAveragesByAge.collect()
     
     // Sort and print the final results.
-    results.sorted.foreach(println)
+    results.foreach(println)
   }
     
 }
