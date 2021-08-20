@@ -33,21 +33,14 @@ object OtherFriendsByAgeDataset {
     val peopleCached = people.select("age", "numFriends").cache()
 
     // Group by age and compute numFriends average
-    val meanNumFriendsByAge = peopleCached
+    peopleCached
       .groupBy("age")
-      .avg("numFriends")
-      .withColumn("avg(numFriends)", col("avg(numFriends)").cast("int"))
-
-    // Get and prettify results
-    val resultDS = meanNumFriendsByAge
-      .withColumnRenamed("avg(numFriends)", "avgNumFriends")
-      .orderBy(col("avg(numFriends)").desc)
-    val results = resultDS.collect()
+      .agg(round(avg("numFriends"), 2).alias("avgNumFriends"))
+      .sort(desc("avgNumFriends"))
+      .show()
 
     // Stop and unpersist people dataset
     people.unpersist()
     spark.stop()
-
-    results.foreach(println)
   }
 }

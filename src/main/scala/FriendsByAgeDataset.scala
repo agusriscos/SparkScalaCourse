@@ -42,7 +42,7 @@ object FriendsByAgeDataset {
     // Get and prettify results
     val resultDS = meanNumFriendsByAge
       .withColumnRenamed("avg(numFriends)", "avgNumFriends")
-      .orderBy(col("avg(numFriends)").desc)
+      .orderBy(col("avgNumFriends").desc)
     val results = resultDS.collect()
 
     people.unpersist()
