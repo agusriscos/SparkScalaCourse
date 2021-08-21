@@ -2,7 +2,7 @@ import org.apache.log4j._
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
-object OtherFriendsByAgeDataset {
+object FriendsByAgeDatasetAlternative {
 
   case class Person(ID:Int, name:String, age:Int, numFriends:Int)
 
@@ -15,7 +15,7 @@ object OtherFriendsByAgeDataset {
     // Use new SparkSession interface in Spark 2.0
     val spark = SparkSession
       .builder
-      .appName("OtherFriendsByAgeDataset")
+      .appName("FriendsByAgeDatasetAlternative")
       .master("local[*]")
       .getOrCreate()
     
