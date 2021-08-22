@@ -40,14 +40,13 @@ object FriendsByAgeDataset {
       .withColumn("avg(numFriends)", col("avg(numFriends)").cast("int"))
 
     // Get and prettify results
-    val resultDS = meanNumFriendsByAge
+    meanNumFriendsByAge
       .withColumnRenamed("avg(numFriends)", "avgNumFriends")
       .orderBy(col("avgNumFriends").desc)
-    val results = resultDS.collect()
+      .show()
 
     people.unpersist()
     spark.stop()
 
-    results.foreach(println)
   }
 }
