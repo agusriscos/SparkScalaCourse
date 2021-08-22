@@ -1,17 +1,11 @@
 import org.apache.log4j._
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.{StructType, IntegerType, StringType}
 
 object FriendsByAgeDataset {
 
-  case class Person(age:Int, numFriends:Int)
-
-  def mapper(line:String): Person = {
-    val fields = line.split(',')
-
-    val person:Person = Person(fields(2).toInt, fields(3).toInt)
-    person
-  }
+  case class Person(id:Int, name: String, age:Int, numFriends:Int)
   
   /** Our main function where the action happens */
   def main(args: Array[String]): Unit = {
@@ -28,25 +22,31 @@ object FriendsByAgeDataset {
     
     // Convert our csv file to a DataSet, using our Person case
     // class to infer the schema.
-    import spark.implicits._
+    val personSchema = new StructType()
+      .add("id", IntegerType, nullable = false)
+      .add("name", StringType, nullable = true)
+      .add("age", IntegerType, nullable = true)
+      .add("numFriends", IntegerType, nullable = true)
 
-    val lines = spark.sparkContext.textFile("./data/fakefriends.csv")
-    val people = lines.map(mapper).toDS.cache()
+    import spark.implicits._
+    val people = spark.read
+      .schema(personSchema)
+      .csv("./data/fakefriends.csv")
+      .as[Person]
+
+    val ageAndFriends = people.select("age", "numFriends")
 
     // Group by age and compute numFriends average
-    val meanNumFriendsByAge = people
+    val meanNumFriendsByAge = ageAndFriends
       .groupBy("age")
       .avg("numFriends")
-      .withColumn("avg(numFriends)", col("avg(numFriends)").cast("int"))
+      .withColumn("avgNumFriends", round($"avg(numFriends)", 2))
+      .select("age", "avgNumFriends")
 
-    // Get and prettify results
+    // Prettify and show results
     meanNumFriendsByAge
-      .withColumnRenamed("avg(numFriends)", "avgNumFriends")
-      .orderBy(col("avgNumFriends").desc)
-      .show()
-
-    people.unpersist()
-    spark.stop()
+      .sort(desc("avgNumFriends"))
+      .show(meanNumFriendsByAge.count.toInt)
 
   }
 }
