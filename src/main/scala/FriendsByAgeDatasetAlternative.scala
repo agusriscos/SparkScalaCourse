@@ -30,17 +30,14 @@ object FriendsByAgeDatasetAlternative {
       .as[Person]
 
     // Select columns and save DS to cache
-    val peopleCached = people.select("age", "numFriends").cache()
+    val fields = people.select("age", "numFriends")
 
     // Group by age and compute numFriends average
-    peopleCached
+    fields
       .groupBy("age")
       .agg(round(avg("numFriends"), 2).alias("avgNumFriends"))
       .sort(desc("avgNumFriends"))
       .show()
 
-    // Stop and unpersist people dataset
-    people.unpersist()
-    spark.stop()
   }
 }

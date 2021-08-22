@@ -42,7 +42,7 @@ object MinTemperaturesDataset {
     // Get the minimum temperature by weather station
     val minTempsByStation = stationTemps.groupBy("stationID").min("temperature")
 
-    // Convert to Farenheit and prettify results
+    // Convert to Fahrenheit and prettify results
     val minTempsByStationF = minTempsByStation
       .withColumn("temperature", round($"min(temperature)" * 0.1f * (9.0f / 5.0f) + 32.0f, 2))
       .select("stationID", "temperature")
