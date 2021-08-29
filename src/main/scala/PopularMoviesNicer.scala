@@ -69,7 +69,7 @@ object PopularMoviesNicer {
     val lookupNameUDF = udf(lookupName)
 
     val moviesWithNames = movieCounts.withColumn("movieTitle", lookupNameUDF(col("movieID")))
-    moviesWithNames.show(moviesWithNames.count.toInt, truncate = false)
+    moviesWithNames.select("movieTitle", "count").show(moviesWithNames.count.toInt, truncate = false)
 
   }
 
