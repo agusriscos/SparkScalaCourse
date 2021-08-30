@@ -30,7 +30,7 @@ object MostPopularSuperheroDataset {
     val names = spark
       .read
       .schema(superHeroNameSchema)
-      .option("sep", " ")
+      .options(Map("sep" -> " ", "charset" -> "ISO-8859-1"))
       .csv("./data/Marvel-names.txt")
       .as[SuperHeroName]
 
