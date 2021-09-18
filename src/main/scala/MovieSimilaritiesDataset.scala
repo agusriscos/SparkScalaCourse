@@ -12,6 +12,18 @@ object MovieSimilaritiesDataset {
   case class MoviePairs(movie1: Int, movie2: Int, rating1: Int, rating2: Int)
   case class MoviePairsSimilarity(movie1: Int, movie2: Int, score: Double, numPairs: Long)
 
+  def computePearsonSimilarity(spark: SparkSession, data: Dataset[MoviePairs]): Dataset[MoviePairsSimilarity] = {
+    val calculateSimilarity = data
+      .groupBy("movie1", "movie2")
+      .agg(
+        abs(corr(col("rating1"), col("rating2"))).alias("score"),
+        count(col("movie1")).alias("numPairs")
+      )
+
+    import spark.implicits._
+    calculateSimilarity.select("movie1", "movie2", "score", "numPairs").as[MoviePairsSimilarity]
+  }
+
   def computeCosineSimilarity(spark: SparkSession, data: Dataset[MoviePairs]): Dataset[MoviePairsSimilarity] = {
     // Compute xx, xy and yy columns
     val pairScores = data
@@ -90,11 +102,14 @@ object MovieSimilaritiesDataset {
       .as[Movies]
 
     val ratings = movies.select("userId", "movieId", "rating")
+    val bestRatings = movies.filter(
+      col("rating") > 3
+    )
 
     // Emit every movie rated together by the same user.
     // Self-join to find every combination.
     // Select movie pairs and rating pairs
-    val moviePairs = ratings.as("ratings1")
+    val moviePairs = bestRatings.as("ratings1")
       .join(ratings.as("ratings2"), $"ratings1.userId" === $"ratings2.userId" && $"ratings1.movieId" < $"ratings2.movieId")
       .select($"ratings1.movieId".alias("movie1"),
         $"ratings2.movieId".alias("movie2"),
@@ -102,10 +117,10 @@ object MovieSimilaritiesDataset {
         $"ratings2.rating".alias("rating2")
       ).as[MoviePairs]
 
-    val moviePairSimilarities = computeCosineSimilarity(spark, moviePairs).cache()
+    val moviePairSimilarities = computePearsonSimilarity(spark, moviePairs).cache()
 
     if (args.length > 0) {
-      val scoreThreshold = 0.97
+      val scoreThreshold = 0.0
       val coOccurrenceThreshold = 50.0
 
       val movieID: Int = args(0).toInt
